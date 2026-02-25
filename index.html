@@ -148,11 +148,11 @@
         // 綁定專屬的 GAS 後端 API 網址
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyZ8ONPSxl0k5ZybOItosDbeCyb0P4Nb_xgcNlh3izSjrV-V11Y6lUMEkqs4JzZMjWhsg/exec";
         
-        // 前端指定的模型清單
+        // 前端指定的模型清單 (修正大師模式設定)
         const MODELS = {
             t2i: {
                 fast: "imagen-4.0-fast-generate-001",
-                high: "nano-banana-pro-preview" // 文字生圖大師模式（換回具有強大文字渲染能力的多模態模型）
+                high: "imagen-4.0-ultra-generate-001" // 文字生圖大師模式
             },
             i2i: {
                 fast: "gemini-2.5-flash-image",
@@ -266,7 +266,7 @@
             const selectedQuality = document.querySelector('input[name="quality"]:checked').value;
             const targetModel = MODELS[modeSelect.value][selectedQuality];
 
-            // 智能路由修正：確保 nano-banana-pro-preview 模型能夠正確使用 Gemini 的 generateContent API 端點
+            // 智能路由修正：確保模型能夠正確使用相應的 API 端點
             let backendMode = modeSelect.value;
             if (targetModel.includes('nano-banana') || targetModel.includes('gemini')) {
                 backendMode = 'i2i'; 
@@ -294,13 +294,37 @@
             currentAbortController = new AbortController();
             
             try {
-                const response = await fetch(GAS_URL, {
+                let response = await fetch(GAS_URL, {
                     method: 'POST',
                     body: JSON.stringify(payload),
                     signal: currentAbortController.signal // 綁定中斷信號
                 });
                 
-                const data = await response.json();
+                let data = await response.json();
+                
+                // 自動備援機制 (Graceful Degradation)：攔截 503 等高負載錯誤並降級重試
+                if (data.status !== "success" && data.error && (data.error.includes("503") || data.error.includes("high demand") || data.error.includes("UNAVAILABLE")) && selectedQuality === 'high') {
+                    addMessage('ai', "⚠️ **自動備援啟動**：大師模式引擎目前處於高負載狀態 (503 High Demand)。系統已觸發優雅降級，正自動為您切換至「⚡ 草稿模式」極速引擎重新生成，請稍候...");
+                    
+                    // 切換為 fast 備援模型
+                    const fallbackModel = MODELS[modeSelect.value]['fast'];
+                    let fallbackBackendMode = modeSelect.value;
+                    if (fallbackModel.includes('nano-banana') || fallbackModel.includes('gemini')) {
+                        fallbackBackendMode = 'i2i'; 
+                    }
+                    
+                    payload.quality = 'fast';
+                    payload.model = fallbackModel;
+                    payload.mode = fallbackBackendMode;
+                    
+                    // 第二次 Fetch (使用降級模型重試)
+                    response = await fetch(GAS_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(payload),
+                        signal: currentAbortController.signal
+                    });
+                    data = await response.json();
+                }
                 
                 if (data.status === "success") {
                     addMessage('ai', data.reply, { image: data.image, mime: data.mime });
