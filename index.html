@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>gem-studio/anyGem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* GitHub 系統字體 */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeInUp 0.3s ease-out forwards; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; border: 2px solid #0d1117; }
+        ::-webkit-scrollbar-thumb:hover { background: #8b949e; }
+        
+        .preview-active { display: flex; opacity: 1; padding: 0.5rem; border-bottom: 1px solid #30363d; }
+        .preview-hidden { display: none; opacity: 0; }
+        
+        /* 自訂 Segment Control 樣式 */
+        .engine-radio:checked + div {
+            background-color: #21262d;
+            border-color: #8b949e;
+            color: #c9d1d9;
+        }
+    </style>
+</head>
+<body class="bg-[#0d1117] text-[#c9d1d9] h-screen flex flex-col overflow-hidden">
+
+    <!-- GitHub Style Header -->
+    <header class="bg-[#161b22] border-b border-[#21262d] py-3 px-4 flex flex-col md:flex-row md:items-center justify-between z-50 shadow-sm">
+        <div class="flex items-center gap-2 mb-3 md:mb-0">
+            <!-- GitHub Logo Vector -->
+            <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" class="fill-[#c9d1d9]"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.46-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
+            <div class="ml-2 text-lg">
+                <span class="text-[#58a6ff] hover:underline cursor-pointer">gem-studio</span>
+                <span class="text-[#8b949e] mx-1">/</span>
+                <span class="text-[#c9d1d9] font-bold hover:underline cursor-pointer">anyGem</span>
+            </div>
+            <span class="border border-[#30363d] rounded-full px-2 py-0.5 text-[12px] text-[#8b949e] ml-2 font-medium">Public</span>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <!-- Mode Select -->
+            <select id="mode-select" class="bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] text-sm py-1.5 px-3 rounded-md border border-[#30363d] outline-none font-medium cursor-pointer transition-colors appearance-none pr-8 relative" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23c9d1d9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right .7em top 50%; background-size: .65em auto;">
+                <option value="t2i">🎨 Text to Image</option>
+                <option value="i2i">🖼️ Image Edit</option>
+            </select>
+            
+            <!-- Quality Segmented Control -->
+            <div class="flex bg-[#0d1117] border border-[#30363d] rounded-md p-[2px]">
+                <label class="cursor-pointer">
+                    <input type="radio" name="quality" value="fast" class="engine-radio hidden" checked>
+                    <div class="px-3 py-1 rounded-md text-xs font-medium text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+                        ⚡ Draft
+                    </div>
+                </label>
+                <label class="cursor-pointer">
+                    <input type="radio" name="quality" value="high" class="engine-radio hidden">
+                    <div class="px-3 py-1 rounded-md text-xs font-medium text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+                        💎 Master
+                    </div>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Chat/Timeline Area -->
+    <main id="chat-window" class="flex-grow p-4 md:p-6 overflow-y-auto space-y-6 scroll-smooth w-full"></main>
+
+    <!-- Input Footer (GitHub Comment Box Style) -->
+    <footer class="p-4 bg-[#0d1117] border-t border-[#21262d] z-50">
+        <div class="max-w-4xl mx-auto flex gap-3">
+            <!-- User Avatar -->
+            <div class="hidden md:flex flex-shrink-0 mt-1">
+                <div class="w-10 h-10 rounded-full bg-[#238636] flex items-center justify-center text-white font-bold text-lg shadow-sm">U</div>
+            </div>
+            
+            <!-- Comment Box -->
+            <div class="flex-grow border border-[#30363d] rounded-md bg-[#0d1117] flex flex-col relative focus-within:border-[#58a6ff] focus-within:ring-1 focus-within:ring-[#58a6ff] transition-all">
+                
+                <!-- Tab Header -->
+                <div class="bg-[#161b22] border-b border-[#30363d] px-2 pt-2 flex gap-1 rounded-t-md">
+                    <div class="px-4 py-2 text-[#c9d1d9] border border-[#30363d] border-b-transparent bg-[#0d1117] rounded-t-md text-sm font-medium -mb-px z-10">Write</div>
+                    <div class="px-4 py-2 text-[#8b949e] hover:text-[#c9d1d9] text-sm font-medium cursor-not-allowed">Preview</div>
+                </div>
+
+                <!-- Preview Area (Hidden by default) -->
+                <div id="upload-preview-container" class="preview-hidden bg-[#0d1117] items-center gap-3">
+                    <div class="relative inline-block border border-[#30363d] rounded-md p-1 bg-[#161b22]">
+                        <img id="upload-thumbnail" class="h-16 w-16 object-cover rounded-sm">
+                        <button onclick="clearUpload()" class="absolute -top-2 -right-2 bg-[#da3633] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-[#b62324] shadow-md border border-[#0d1117]">✕</button>
+                    </div>
+                    <div class="text-xs text-[#8b949e]">
+                        <span class="text-[#c9d1d9] font-medium">Image attached.</span> Mode automatically set to <span class="border border-[#30363d] rounded px-1 text-[#c9d1d9]">Image Edit</span>.
+                    </div>
+                </div>
+
+                <!-- Textarea -->
+                <div class="p-2 bg-[#0d1117]">
+                    <textarea id="user-input" class="w-full bg-[#0d1117] text-[#c9d1d9] outline-none resize-none p-2 min-h-[80px] text-sm placeholder-[#8b949e]" placeholder="Leave a comment or describe the image you want..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSend(); }"></textarea>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="flex justify-between items-center p-2 bg-[#161b22] rounded-b-md">
+                    <input type="file" id="file-upload" class="hidden" accept="image/jpeg, image/png, image/webp">
+                    <button onclick="document.getElementById('file-upload').click()" class="text-[#8b949e] hover:text-[#58a6ff] p-2 rounded-md transition-colors" title="Attach an image">
+                        <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" class="fill-current"><path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5h-3.32Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"></path></svg>
+                    </button>
+                    
+                    <button onclick="handleSend()" id="send-btn" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-1.5 rounded-md font-medium border border-[rgba(240,246,252,0.1)] text-sm transition-colors flex items-center gap-2">
+                        <span>Generate</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const input = document.getElementById('user-input');
+        const btn = document.getElementById('send-btn');
+        const modeSelect = document.getElementById('mode-select');
+        const fileInput = document.getElementById('file-upload');
+        const previewContainer = document.getElementById('upload-preview-container');
+        const thumbnail = document.getElementById('upload-thumbnail');
+        
+        let activeFile = null;
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                modeSelect.value = "i2i";
+                activeFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    thumbnail.src = e.target.result;
+                    previewContainer.classList.remove('preview-hidden');
+                    previewContainer.classList.add('preview-active');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function clearUpload() {
+            activeFile = null;
+            fileInput.value = '';
+            previewContainer.classList.remove('preview-active');
+            previewContainer.classList.add('preview-hidden');
+            modeSelect.value = "t2i";
+        }
+
+        async function handleSend() {
+            const text = input.value.trim();
+            if (!text && !activeFile) return;
+            
+            const userMsg = activeFile ? `[Image Attached]\n\n${text}` : text;
+            addMessage('user', userMsg);
+            
+            const selectedQuality = document.querySelector('input[name="quality"]:checked').value;
+            const payload = { 
+                message: text || "Please modify this image based on its context.", 
+                mode: modeSelect.value,
+                quality: selectedQuality
+            };
+            
+            input.value = '';
+            
+            if (activeFile) {
+                const base64Data = await toBase64(activeFile);
+                payload.file_data = base64Data.split(',')[1];
+                payload.mime_type = activeFile.type;
+                clearUpload();
+            }
+
+            setLoading(true);
+            
+            // 呼叫 GAS 原生的 google.script.run
+            if(typeof google !== 'undefined' && google.script) {
+                google.script.run
+                    .withSuccessHandler(function(data) {
+                        if (data.status === "success") {
+                            addMessage('ai', data.reply, { image: data.image, mime: data.mime });
+                        } else { 
+                            addMessage('ai', "🚨 Error: " + data.error); 
+                        }
+                        setLoading(false);
+                    })
+                    .withFailureHandler(function(error) {
+                        addMessage('ai', "❌ Execution failed: " + error.message);
+                        setLoading(false);
+                    })
+                    .processFromFrontend(payload);
+            } else {
+                // 模擬環境測試用 (如果不在 GAS 環境下執行)
+                setTimeout(() => {
+                    addMessage('ai', "*(Mock Response)*\nGAS environment `google.script.run` is not detected. Please deploy to Google Apps Script.", null);
+                    setLoading(false);
+                }, 1000);
+            }
+        }
+
+        // 渲染 GitHub Timeline Issue 留言風格
+        function addMessage(role, text, meta = null) {
+            const isUser = role === 'user';
+            const author = isUser ? 'You' : 'anyGem';
+            const badge = !isUser ? '<span class="border border-[#30363d] text-[#8b949e] rounded-full px-2 py-[1px] text-[10px] ml-2 font-medium">bot</span>' : '';
+            const avatarColor = isUser ? 'bg-[#238636]' : 'bg-[#8957e5]'; 
+            const avatarInit = isUser ? 'U' : 'A';
+            
+            // 處理時間
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex gap-3 md:gap-4 animate-fade-in w-full max-w-4xl mx-auto`;
+            
+            // 圖片 HTML
+            let imgHTML = '';
+            if (meta && meta.image) {
+                imgHTML = `<img src="data:${meta.mime || 'image/png'};base64,${meta.image}" class="w-full max-w-2xl rounded-md mb-4 border border-[#30363d] cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open(this.src, '_blank')">`;
+            }
+
+            // 文字 HTML (處理換行與簡單格式)
+            let textHTML = '';
+            if (text) {
+                // 將換行轉為 <br>
+                const formattedText = text.replace(/\n/g, '<br>');
+                textHTML = `<div class="text-[14px] leading-[1.5] break-words text-[#c9d1d9]">${formattedText}</div>`;
+            }
+
+            wrapper.innerHTML = `
+                <div class="flex-shrink-0 hidden md:block">
+                    <div class="w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                        ${avatarInit}
+                    </div>
+                </div>
+                <div class="flex-grow min-w-0">
+                    <div class="border border-[#30363d] rounded-md bg-[#0d1117] relative before:hidden md:before:block before:absolute before:right-[100%] before:top-4 before:border-8 before:border-transparent before:border-r-[#30363d] after:hidden md:after:block after:absolute after:right-[100%] after:top-[17px] after:border-[7px] after:border-transparent after:border-r-[#161b22]">
+                        <!-- Comment Header -->
+                        <div class="bg-[#161b22] border-b border-[#30363d] px-3 py-2 rounded-t-md text-sm flex items-center text-[#8b949e]">
+                            <span class="font-semibold text-[#c9d1d9]">${author}</span> ${badge}
+                            <span class="ml-2 hidden sm:inline">commented at ${timeString}</span>
+                        </div>
+                        <!-- Comment Body -->
+                        <div class="p-3 md:p-4">
+                            ${imgHTML}
+                            ${textHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            chatWindow.appendChild(wrapper); 
+            
+            setTimeout(() => {
+                chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
+            }, 100);
+        }
+
+        function setLoading(isLoading) { 
+            btn.disabled = isLoading; 
+            if (isLoading) { 
+                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Generating...</span>`;
+            } else { 
+                btn.innerHTML = '<span>Generate</span>';
+            } 
+        }
+        
+        function toBase64(file) { 
+            return new Promise((resolve, reject) => { 
+                const reader = new FileReader(); 
+                reader.onload = () => resolve(reader.result); 
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file); 
+            }); 
+        }
+
+        // 初始化一則歡迎訊息
+        window.onload = () => {
+            setTimeout(() => {
+                addMessage('ai', "Welcome to **gem-studio/anyGem**! 🚀\n\nI am ready to generate or edit images for you. Feel free to leave a prompt below or attach an image to begin.");
+            }, 500);
+        };
+    </script>
+</body>
+</html>
