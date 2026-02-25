@@ -79,6 +79,20 @@
             <!-- Comment Box -->
             <div class="flex-grow border border-[#30363d] rounded-md bg-[#0d1117] flex flex-col relative focus-within:border-[#58a6ff] focus-within:ring-1 focus-within:ring-[#58a6ff] transition-all">
                 
+                <!-- Prompt Helper Popover Panel (Hidden by default) -->
+                <div id="prompt-helper-panel" class="hidden absolute bottom-full left-0 mb-2 w-full sm:w-[500px] bg-[#161b22] border border-[#30363d] rounded-md shadow-2xl z-50 flex-col overflow-hidden text-sm animate-fade-in">
+                    <div class="px-3 py-2 bg-[#0d1117] border-b border-[#30363d] flex justify-between items-center">
+                        <span class="font-bold text-[#c9d1d9] flex items-center gap-2">
+                            <svg aria-hidden="true" height="14" viewBox="0 0 16 16" version="1.1" width="14" class="fill-[#8b949e]"><path d="M1 7.775V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775Zm1.5 0c0 .066.026.13.073.177l6.25 6.25a.25.25 0 0 0 .354 0l5.025-5.025a.25.25 0 0 0 0-.354l-6.25-6.25a.25.25 0 0 0-.177-.073H2.75a.25.25 0 0 0-.25.25ZM6 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>
+                            生圖風格提示詞 (Prompt Tags)
+                        </span>
+                        <button onclick="togglePromptHelper()" class="text-[#8b949e] hover:text-[#c9d1d9] p-1 rounded-md hover:bg-[#30363d] transition-colors">✕</button>
+                    </div>
+                    <div class="p-3 max-h-[250px] overflow-y-auto space-y-4" id="style-categories">
+                        <!-- Style categories will be injected here via JS -->
+                    </div>
+                </div>
+
                 <!-- Tab Header -->
                 <div class="bg-[#161b22] border-b border-[#30363d] px-2 pt-2 flex gap-1 rounded-t-md">
                     <div class="px-4 py-2 text-[#c9d1d9] border border-[#30363d] border-b-transparent bg-[#0d1117] rounded-t-md text-sm font-medium -mb-px z-10">撰寫</div>
@@ -103,10 +117,16 @@
 
                 <!-- Footer Actions -->
                 <div class="flex justify-between items-center p-2 bg-[#161b22] rounded-b-md">
-                    <input type="file" id="file-upload" class="hidden" accept="image/jpeg, image/png, image/webp">
-                    <button onclick="document.getElementById('file-upload').click()" class="text-[#8b949e] hover:text-[#58a6ff] p-2 rounded-md transition-colors" title="附加圖片">
-                        <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" class="fill-current"><path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5h-3.32Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"></path></svg>
-                    </button>
+                    <div class="flex gap-1">
+                        <input type="file" id="file-upload" class="hidden" accept="image/jpeg, image/png, image/webp">
+                        <button onclick="document.getElementById('file-upload').click()" class="text-[#8b949e] hover:text-[#58a6ff] p-2 rounded-md transition-colors hover:bg-[#30363d]" title="附加圖片">
+                            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" class="fill-current"><path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5h-3.32Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"></path></svg>
+                        </button>
+                        <!-- Style Prompt Tool Button -->
+                        <button onclick="togglePromptHelper()" type="button" class="text-[#8b949e] hover:text-[#e3b341] p-2 rounded-md transition-colors hover:bg-[#30363d]" title="風格提示詞工具">
+                            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" class="fill-current"><path d="M1 7.775V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775Zm1.5 0c0 .066.026.13.073.177l6.25 6.25a.25.25 0 0 0 .354 0l5.025-5.025a.25.25 0 0 0 0-.354l-6.25-6.25a.25.25 0 0 0-.177-.073H2.75a.25.25 0 0 0-.25.25ZM6 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>
+                        </button>
+                    </div>
                     
                     <button onclick="handleSend()" id="send-btn" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-1.5 rounded-md font-medium border border-[rgba(240,246,252,0.1)] text-sm transition-colors flex items-center gap-2">
                         <span>生成</span>
@@ -129,6 +149,69 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyZ8ONPSxl0k5ZybOItosDbeCyb0P4Nb_xgcNlh3izSjrV-V11Y6lUMEkqs4JzZMjWhsg/exec";
         
         let activeFile = null;
+
+        // --- 風格提示詞工具邏輯開始 ---
+        const styleData = [
+            {
+                category: "🎨 藝術風格 (Art Style)",
+                items: ["賽博龐克 (Cyberpunk)", "吉卜力動畫風格 (Ghibli Studio)", "寫實攝影 (Photorealistic)", "新海誠風格 (Makoto Shinkai)", "復古像素藝術 (Pixel Art)", "厚塗水彩 (Watercolor)", "3D 辛烷值渲染 (Octane Render)", "極簡主義 (Minimalism)"]
+            },
+            {
+                category: "💡 光影渲染 (Lighting)",
+                items: ["電影級光影 (Cinematic Lighting)", "霓虹燈光 (Neon Lights)", "丁達爾效應/體積光 (Volumetric Lighting)", "黃金時刻 (Golden Hour)", "柔和漫反射 (Soft Illumination)"]
+            },
+            {
+                category: "📷 鏡頭與視角 (Camera)",
+                items: ["微距特寫 (Macro Shot)", "超廣角 (Ultra-Wide Angle)", "鳥瞰視角 (Bird's-Eye View)", "景深模糊 (Depth of Field)", "魚眼鏡頭 (Fisheye Lens)"]
+            },
+            {
+                category: "🌌 氛圍與環境 (Atmosphere)",
+                items: ["史詩感 (Epic)", "黑暗奇幻 (Dark Fantasy)", "溫馨平靜 (Cozy & Peaceful)", "未來科技感 (Futuristic Sci-Fi)", "廢土風格 (Post-Apocalyptic)"]
+            }
+        ];
+
+        function initPromptHelper() {
+            const container = document.getElementById('style-categories');
+            styleData.forEach(group => {
+                const groupDiv = document.createElement('div');
+                groupDiv.innerHTML = `<div class="text-[#8b949e] text-xs font-semibold mb-2">${group.category}</div>`;
+                const tagsDiv = document.createElement('div');
+                tagsDiv.className = "flex flex-wrap gap-2";
+                
+                group.items.forEach(item => {
+                    const tag = document.createElement('button');
+                    tag.type = "button";
+                    tag.className = "border border-[#30363d] bg-[#21262d] text-[#c9d1d9] hover:bg-[#30363d] hover:border-[#8b949e] transition-colors text-xs px-2.5 py-1 rounded-full text-left";
+                    tag.innerText = item;
+                    tag.onclick = () => appendPrompt(item);
+                    tagsDiv.appendChild(tag);
+                });
+                groupDiv.appendChild(tagsDiv);
+                container.appendChild(groupDiv);
+            });
+        }
+
+        function togglePromptHelper() {
+            const panel = document.getElementById('prompt-helper-panel');
+            if(panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                panel.classList.add('flex');
+            } else {
+                panel.classList.add('hidden');
+                panel.classList.remove('flex');
+            }
+        }
+
+        function appendPrompt(text) {
+            const currentValue = input.value.trim();
+            const prefix = currentValue ? ", " : "";
+            input.value = currentValue + prefix + text;
+            input.focus();
+            
+            // 可以選擇加入完成後自動關閉面板
+            // togglePromptHelper(); 
+        }
+        // --- 風格提示詞工具邏輯結束 ---
 
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -157,6 +240,10 @@
             const text = input.value.trim();
             if (!text && !activeFile) return;
             
+            // 關閉可能開著的風格面板
+            document.getElementById('prompt-helper-panel').classList.add('hidden');
+            document.getElementById('prompt-helper-panel').classList.remove('flex');
+
             const userMsg = activeFile ? `[已附加圖片]\n\n${text}` : text;
             addMessage('user', userMsg);
             
@@ -275,10 +362,11 @@
             }); 
         }
 
-        // 初始化一則歡迎訊息
+        // 初始化
         window.onload = () => {
+            initPromptHelper(); // 初始化風格提示詞工具
             setTimeout(() => {
-                addMessage('ai', "歡迎來到 **gem-studio/anyGem**！🚀\n\n我已經準備好為您生成或編輯圖片了。請在下方留下提示詞，或附加圖片來開始吧。");
+                addMessage('ai', "歡迎來到 **gem-studio/anyGem**！🚀\n\n我已經準備好為您生成或編輯圖片了。您可以點擊下方工具列的 **🏷️ 標籤按鈕** 來選擇畫風與光影，幫助您更精準地生成圖片！");
             }, 500);
         };
     </script>
