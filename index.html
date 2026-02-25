@@ -125,6 +125,9 @@
         const previewContainer = document.getElementById('upload-preview-container');
         const thumbnail = document.getElementById('upload-thumbnail');
         
+        // 綁定專屬的 GAS 後端 API 網址
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyZ8ONPSxl0k5ZybOItosDbeCyb0P4Nb_xgcNlh3izSjrV-V11Y6lUMEkqs4JzZMjWhsg/exec";
+        
         let activeFile = null;
 
         fileInput.addEventListener('change', (e) => {
@@ -175,28 +178,24 @@
 
             setLoading(true);
             
-            // 呼叫 GAS 原生的 google.script.run
-            if(typeof google !== 'undefined' && google.script) {
-                google.script.run
-                    .withSuccessHandler(function(data) {
-                        if (data.status === "success") {
-                            addMessage('ai', data.reply, { image: data.image, mime: data.mime });
-                        } else { 
-                            addMessage('ai', "🚨 Error: " + data.error); 
-                        }
-                        setLoading(false);
-                    })
-                    .withFailureHandler(function(error) {
-                        addMessage('ai', "❌ Execution failed: " + error.message);
-                        setLoading(false);
-                    })
-                    .processFromFrontend(payload);
-            } else {
-                // 模擬環境測試用 (如果不在 GAS 環境下執行)
-                setTimeout(() => {
-                    addMessage('ai', "*(Mock Response)*\nGAS environment `google.script.run` is not detected. Please deploy to Google Apps Script.", null);
-                    setLoading(false);
-                }, 1000);
+            try {
+                // 使用原生的 fetch 發送請求到 Google Apps Script
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === "success") {
+                    addMessage('ai', data.reply, { image: data.image, mime: data.mime });
+                } else { 
+                    addMessage('ai', "🚨 Error: " + data.error); 
+                }
+            } catch (error) {
+                addMessage('ai', "❌ Execution failed: " + error.message + "\n\n*(提示：請確認您的 GAS 部署設定中，「誰可以存取」是否已設為「所有人」)*");
+            } finally {
+                setLoading(false);
             }
         }
 
