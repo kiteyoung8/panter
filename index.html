@@ -152,7 +152,7 @@
         const MODELS = {
             t2i: {
                 fast: "imagen-4.0-fast-generate-001",
-                high: "imagen-4.0-ultra-generate-001" // 文字生圖大師模式
+                high: "nano-banana-pro-preview" // 文字生圖大師模式（換回具有強大文字渲染能力的多模態模型）
             },
             i2i: {
                 fast: "gemini-2.5-flash-image",
@@ -266,9 +266,15 @@
             const selectedQuality = document.querySelector('input[name="quality"]:checked').value;
             const targetModel = MODELS[modeSelect.value][selectedQuality];
 
+            // 智能路由修正：確保 nano-banana-pro-preview 模型能夠正確使用 Gemini 的 generateContent API 端點
+            let backendMode = modeSelect.value;
+            if (targetModel.includes('nano-banana') || targetModel.includes('gemini')) {
+                backendMode = 'i2i'; 
+            }
+
             const payload = { 
                 message: text || "請根據這張圖片進行修改或提供建議。", 
-                mode: modeSelect.value,
+                mode: backendMode,
                 quality: selectedQuality,
                 model: targetModel 
             };
