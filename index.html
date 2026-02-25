@@ -37,14 +37,14 @@
                 <span class="text-[#8b949e] mx-1">/</span>
                 <span class="text-[#c9d1d9] font-bold hover:underline cursor-pointer">anyGem</span>
             </div>
-            <span class="border border-[#30363d] rounded-full px-2 py-0.5 text-[12px] text-[#8b949e] ml-2 font-medium">Public</span>
+            <span class="border border-[#30363d] rounded-full px-2 py-0.5 text-[12px] text-[#8b949e] ml-2 font-medium">公開</span>
         </div>
         
         <div class="flex items-center gap-3">
             <!-- Mode Select -->
             <select id="mode-select" class="bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] text-sm py-1.5 px-3 rounded-md border border-[#30363d] outline-none font-medium cursor-pointer transition-colors appearance-none pr-8 relative" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23c9d1d9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right .7em top 50%; background-size: .65em auto;">
-                <option value="t2i">🎨 Text to Image</option>
-                <option value="i2i">🖼️ Image Edit</option>
+                <option value="t2i">🎨 文字生圖</option>
+                <option value="i2i">🖼️ 圖片編輯</option>
             </select>
             
             <!-- Quality Segmented Control -->
@@ -52,13 +52,13 @@
                 <label class="cursor-pointer">
                     <input type="radio" name="quality" value="fast" class="engine-radio hidden" checked>
                     <div class="px-3 py-1 rounded-md text-xs font-medium text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
-                        ⚡ Draft
+                        ⚡ 草稿
                     </div>
                 </label>
                 <label class="cursor-pointer">
                     <input type="radio" name="quality" value="high" class="engine-radio hidden">
                     <div class="px-3 py-1 rounded-md text-xs font-medium text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
-                        💎 Master
+                        💎 大師
                     </div>
                 </label>
             </div>
@@ -81,8 +81,8 @@
                 
                 <!-- Tab Header -->
                 <div class="bg-[#161b22] border-b border-[#30363d] px-2 pt-2 flex gap-1 rounded-t-md">
-                    <div class="px-4 py-2 text-[#c9d1d9] border border-[#30363d] border-b-transparent bg-[#0d1117] rounded-t-md text-sm font-medium -mb-px z-10">Write</div>
-                    <div class="px-4 py-2 text-[#8b949e] hover:text-[#c9d1d9] text-sm font-medium cursor-not-allowed">Preview</div>
+                    <div class="px-4 py-2 text-[#c9d1d9] border border-[#30363d] border-b-transparent bg-[#0d1117] rounded-t-md text-sm font-medium -mb-px z-10">撰寫</div>
+                    <div class="px-4 py-2 text-[#8b949e] hover:text-[#c9d1d9] text-sm font-medium cursor-not-allowed">預覽</div>
                 </div>
 
                 <!-- Preview Area (Hidden by default) -->
@@ -92,24 +92,24 @@
                         <button onclick="clearUpload()" class="absolute -top-2 -right-2 bg-[#da3633] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-[#b62324] shadow-md border border-[#0d1117]">✕</button>
                     </div>
                     <div class="text-xs text-[#8b949e]">
-                        <span class="text-[#c9d1d9] font-medium">Image attached.</span> Mode automatically set to <span class="border border-[#30363d] rounded px-1 text-[#c9d1d9]">Image Edit</span>.
+                        <span class="text-[#c9d1d9] font-medium">已附加圖片。</span> 模式已自動切換為 <span class="border border-[#30363d] rounded px-1 text-[#c9d1d9]">圖片編輯</span>。
                     </div>
                 </div>
 
                 <!-- Textarea -->
                 <div class="p-2 bg-[#0d1117]">
-                    <textarea id="user-input" class="w-full bg-[#0d1117] text-[#c9d1d9] outline-none resize-none p-2 min-h-[80px] text-sm placeholder-[#8b949e]" placeholder="Leave a comment or describe the image you want..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSend(); }"></textarea>
+                    <textarea id="user-input" class="w-full bg-[#0d1117] text-[#c9d1d9] outline-none resize-none p-2 min-h-[80px] text-sm placeholder-[#8b949e]" placeholder="留言或描述您想要的圖片..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSend(); }"></textarea>
                 </div>
 
                 <!-- Footer Actions -->
                 <div class="flex justify-between items-center p-2 bg-[#161b22] rounded-b-md">
                     <input type="file" id="file-upload" class="hidden" accept="image/jpeg, image/png, image/webp">
-                    <button onclick="document.getElementById('file-upload').click()" class="text-[#8b949e] hover:text-[#58a6ff] p-2 rounded-md transition-colors" title="Attach an image">
+                    <button onclick="document.getElementById('file-upload').click()" class="text-[#8b949e] hover:text-[#58a6ff] p-2 rounded-md transition-colors" title="附加圖片">
                         <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" class="fill-current"><path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5h-3.32Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"></path></svg>
                     </button>
                     
                     <button onclick="handleSend()" id="send-btn" class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-1.5 rounded-md font-medium border border-[rgba(240,246,252,0.1)] text-sm transition-colors flex items-center gap-2">
-                        <span>Generate</span>
+                        <span>生成</span>
                     </button>
                 </div>
             </div>
@@ -157,12 +157,12 @@
             const text = input.value.trim();
             if (!text && !activeFile) return;
             
-            const userMsg = activeFile ? `[Image Attached]\n\n${text}` : text;
+            const userMsg = activeFile ? `[已附加圖片]\n\n${text}` : text;
             addMessage('user', userMsg);
             
             const selectedQuality = document.querySelector('input[name="quality"]:checked').value;
             const payload = { 
-                message: text || "Please modify this image based on its context.", 
+                message: text || "請根據這張圖片進行修改或提供建議。", 
                 mode: modeSelect.value,
                 quality: selectedQuality
             };
@@ -190,10 +190,10 @@
                 if (data.status === "success") {
                     addMessage('ai', data.reply, { image: data.image, mime: data.mime });
                 } else { 
-                    addMessage('ai', "🚨 Error: " + data.error); 
+                    addMessage('ai', "🚨 錯誤: " + data.error); 
                 }
             } catch (error) {
-                addMessage('ai', "❌ Execution failed: " + error.message + "\n\n*(提示：請確認您的 GAS 部署設定中，「誰可以存取」是否已設為「所有人」)*");
+                addMessage('ai', "❌ 執行失敗: " + error.message + "\n\n*(提示：請確認您的 GAS 部署設定中，「誰可以存取」是否已設為「所有人」)*");
             } finally {
                 setLoading(false);
             }
@@ -202,7 +202,7 @@
         // 渲染 GitHub Timeline Issue 留言風格
         function addMessage(role, text, meta = null) {
             const isUser = role === 'user';
-            const author = isUser ? 'You' : 'anyGem';
+            const author = isUser ? '您' : 'anyGem';
             const badge = !isUser ? '<span class="border border-[#30363d] text-[#8b949e] rounded-full px-2 py-[1px] text-[10px] ml-2 font-medium">bot</span>' : '';
             const avatarColor = isUser ? 'bg-[#238636]' : 'bg-[#8957e5]'; 
             const avatarInit = isUser ? 'U' : 'A';
@@ -239,7 +239,7 @@
                         <!-- Comment Header -->
                         <div class="bg-[#161b22] border-b border-[#30363d] px-3 py-2 rounded-t-md text-sm flex items-center text-[#8b949e]">
                             <span class="font-semibold text-[#c9d1d9]">${author}</span> ${badge}
-                            <span class="ml-2 hidden sm:inline">commented at ${timeString}</span>
+                            <span class="ml-2 hidden sm:inline">留言於 ${timeString}</span>
                         </div>
                         <!-- Comment Body -->
                         <div class="p-3 md:p-4">
@@ -260,9 +260,9 @@
         function setLoading(isLoading) { 
             btn.disabled = isLoading; 
             if (isLoading) { 
-                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>Generating...</span>`;
+                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>生成中...</span>`;
             } else { 
-                btn.innerHTML = '<span>Generate</span>';
+                btn.innerHTML = '<span>生成</span>';
             } 
         }
         
@@ -278,7 +278,7 @@
         // 初始化一則歡迎訊息
         window.onload = () => {
             setTimeout(() => {
-                addMessage('ai', "Welcome to **gem-studio/anyGem**! 🚀\n\nI am ready to generate or edit images for you. Feel free to leave a prompt below or attach an image to begin.");
+                addMessage('ai', "歡迎來到 **gem-studio/anyGem**！🚀\n\n我已經準備好為您生成或編輯圖片了。請在下方留下提示詞，或附加圖片來開始吧。");
             }, 500);
         };
     </script>
