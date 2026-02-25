@@ -6,7 +6,6 @@
     <title>gem-studio/anyGem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* GitHub 系統字體 */
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeInUp 0.3s ease-out forwards; }
@@ -17,12 +16,15 @@
         .preview-active { display: flex; opacity: 1; padding: 0.5rem; border-bottom: 1px solid #30363d; }
         .preview-hidden { display: none; opacity: 0; }
         
-        /* 自訂 Segment Control 樣式 */
         .engine-radio:checked + div {
             background-color: #21262d;
             border-color: #8b949e;
             color: #c9d1d9;
         }
+
+        /* 神器專屬：客製化捲動軸 */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-[#0d1117] text-[#c9d1d9] h-screen flex flex-col overflow-hidden">
@@ -30,7 +32,6 @@
     <!-- GitHub Style Header -->
     <header class="bg-[#161b22] border-b border-[#21262d] py-3 px-4 flex flex-col md:flex-row md:items-center justify-between z-50 shadow-sm">
         <div class="flex items-center gap-2 mb-3 md:mb-0">
-            <!-- GitHub Logo Vector -->
             <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" class="fill-[#c9d1d9]"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.46-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>
             <div class="ml-2 text-lg">
                 <span class="text-[#58a6ff] hover:underline cursor-pointer">gem-studio</span>
@@ -41,25 +42,19 @@
         </div>
         
         <div class="flex items-center gap-3">
-            <!-- Mode Select -->
-            <select id="mode-select" class="bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] text-sm py-1.5 px-3 rounded-md border border-[#30363d] outline-none font-medium cursor-pointer transition-colors appearance-none pr-8 relative" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23c9d1d9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right .7em top 50%; background-size: .65em auto;">
+            <select id="mode-select" class="bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] text-sm py-1.5 px-3 rounded-md border border-[#30363d] outline-none font-medium cursor-pointer appearance-none pr-8 relative" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23c9d1d9%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%0-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right .7em top 50%; background-size: .65em auto;">
                 <option value="t2i">🎨 文字生圖</option>
                 <option value="i2i">🖼️ 圖片編輯</option>
             </select>
             
-            <!-- Quality Segmented Control -->
             <div class="flex bg-[#0d1117] border border-[#30363d] rounded-md p-[2px]">
                 <label class="cursor-pointer">
                     <input type="radio" name="quality" value="fast" class="engine-radio hidden" checked>
-                    <div class="px-3 py-1 rounded-md text-xs font-medium text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
-                        ⚡ 草稿
-                    </div>
+                    <div class="px-3 py-1 rounded-md text-xs font-medium text-[#8b949e] hover:text-[#c9d1d9] transition-colors">⚡ 草稿</div>
                 </label>
                 <label class="cursor-pointer">
                     <input type="radio" name="quality" value="high" class="engine-radio hidden">
-                    <div class="px-3 py-1 rounded-md text-xs font-medium text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
-                        💎 大師
-                    </div>
+                    <div class="px-3 py-1 rounded-md text-xs font-medium text-[#8b949e] hover:text-[#c9d1d9] transition-colors">💎 大師</div>
                 </label>
             </div>
         </div>
@@ -68,63 +63,79 @@
     <!-- Main Chat/Timeline Area -->
     <main id="chat-window" class="flex-grow p-4 md:p-6 overflow-y-auto space-y-6 scroll-smooth w-full"></main>
 
-    <!-- Input Footer (GitHub Comment Box Style) -->
+    <!-- 🪄 提示詞神器模態視窗 (God Mode Prompt Generator) -->
+    <div id="god-prompt-modal" class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-[#161b22] border border-[#30363d] rounded-xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
+            <div class="p-4 border-b border-[#30363d] flex justify-between items-center bg-[#0d1117]">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="text-indigo-400">🪄</span> 提示詞神器 (Prompt Engine)
+                </h2>
+                <button onclick="closeGodModal()" class="text-[#8b949e] hover:text-white text-xl">✕</button>
+            </div>
+            
+            <div class="flex flex-1 overflow-hidden">
+                <!-- 左側：分類選單 -->
+                <div id="god-sidebar" class="w-48 border-r border-[#30363d] bg-[#0d1117] overflow-y-auto custom-scrollbar"></div>
+                <!-- 右側：標籤區 -->
+                <div id="god-content" class="flex-1 p-6 overflow-y-auto bg-[#0d1117] custom-scrollbar">
+                    <div id="style-tags-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+                </div>
+            </div>
+
+            <!-- 下方：預覽與確認 -->
+            <div class="p-4 border-t border-[#30363d] bg-[#161b22] space-y-3">
+                <div class="flex flex-col gap-2">
+                    <div class="text-xs font-semibold text-indigo-400 uppercase tracking-widest">已選取的提示詞序列</div>
+                    <div id="selected-tags-preview" class="bg-[#0d1117] border border-[#30363d] p-3 rounded-md text-sm font-mono min-h-[40px] text-indigo-100 flex flex-wrap gap-2"></div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div class="text-[10px] text-[#8b949e]">提示：點擊標籤即可加入，再次點擊移除。</div>
+                    <div class="flex gap-2">
+                        <button onclick="clearSelectedTags()" class="px-4 py-2 text-sm text-red-400 hover:bg-red-900/20 rounded-md">清空全部</button>
+                        <button onclick="applyGodPrompt()" class="bg-[#238636] hover:bg-[#2ea043] text-white px-6 py-2 rounded-md font-bold text-sm shadow-lg">套用至撰寫區</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Footer -->
     <footer class="p-4 bg-[#0d1117] border-t border-[#21262d] z-50">
         <div class="max-w-4xl mx-auto flex gap-3">
-            <!-- User Avatar -->
             <div class="hidden md:flex flex-shrink-0 mt-1">
                 <div class="w-10 h-10 rounded-full bg-[#238636] flex items-center justify-center text-white font-bold text-lg shadow-sm">U</div>
             </div>
             
-            <!-- Comment Box -->
             <div class="flex-grow border border-[#30363d] rounded-md bg-[#0d1117] flex flex-col relative focus-within:border-[#58a6ff] focus-within:ring-1 focus-within:ring-[#58a6ff] transition-all">
                 
-                <!-- Prompt Helper Popover Panel (Hidden by default) -->
-                <div id="prompt-helper-panel" class="hidden absolute bottom-full left-0 mb-2 w-full sm:w-[500px] bg-[#161b22] border border-[#30363d] rounded-md shadow-2xl z-50 flex-col overflow-hidden text-sm animate-fade-in">
-                    <div class="px-3 py-2 bg-[#0d1117] border-b border-[#30363d] flex justify-between items-center">
-                        <span class="font-bold text-[#c9d1d9] flex items-center gap-2">
-                            <svg aria-hidden="true" height="14" viewBox="0 0 16 16" version="1.1" width="14" class="fill-[#8b949e]"><path d="M1 7.775V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775Zm1.5 0c0 .066.026.13.073.177l6.25 6.25a.25.25 0 0 0 .354 0l5.025-5.025a.25.25 0 0 0 0-.354l-6.25-6.25a.25.25 0 0 0-.177-.073H2.75a.25.25 0 0 0-.25.25ZM6 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>
-                            生圖風格提示詞 (Prompt Tags)
-                        </span>
-                        <button onclick="togglePromptHelper()" class="text-[#8b949e] hover:text-[#c9d1d9] p-1 rounded-md hover:bg-[#30363d] transition-colors">✕</button>
-                    </div>
-                    <div class="p-3 max-h-[250px] overflow-y-auto space-y-4" id="style-categories">
-                        <!-- Style categories will be injected here via JS -->
-                    </div>
-                </div>
-
-                <!-- Tab Header -->
                 <div class="bg-[#161b22] border-b border-[#30363d] px-2 pt-2 flex gap-1 rounded-t-md">
                     <div class="px-4 py-2 text-[#c9d1d9] border border-[#30363d] border-b-transparent bg-[#0d1117] rounded-t-md text-sm font-medium -mb-px z-10">撰寫</div>
-                    <div class="px-4 py-2 text-[#8b949e] hover:text-[#c9d1d9] text-sm font-medium cursor-not-allowed">預覽</div>
                 </div>
 
-                <!-- Preview Area (Hidden by default) -->
+                <!-- Preview Area -->
                 <div id="upload-preview-container" class="preview-hidden bg-[#0d1117] items-center gap-3">
                     <div class="relative inline-block border border-[#30363d] rounded-md p-1 bg-[#161b22]">
                         <img id="upload-thumbnail" class="h-16 w-16 object-cover rounded-sm">
                         <button onclick="clearUpload()" class="absolute -top-2 -right-2 bg-[#da3633] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold hover:bg-[#b62324] shadow-md border border-[#0d1117]">✕</button>
                     </div>
                     <div class="text-xs text-[#8b949e]">
-                        <span class="text-[#c9d1d9] font-medium">已附加圖片。</span> 模式已自動切換為 <span class="border border-[#30363d] rounded px-1 text-[#c9d1d9]">圖片編輯</span>。
+                        <span class="text-[#c9d1d9] font-medium">已附加圖片。</span> 模式自動切換為 <span class="border border-[#30363d] rounded px-1 text-[#c9d1d9]">圖片編輯</span>。
                     </div>
                 </div>
 
-                <!-- Textarea -->
                 <div class="p-2 bg-[#0d1117]">
-                    <textarea id="user-input" class="w-full bg-[#0d1117] text-[#c9d1d9] outline-none resize-none p-2 min-h-[80px] text-sm placeholder-[#8b949e]" placeholder="留言或描述您想要的圖片..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSend(); }"></textarea>
+                    <textarea id="user-input" class="w-full bg-[#0d1117] text-[#c9d1d9] outline-none resize-none p-2 min-h-[100px] text-sm placeholder-[#8b949e]" placeholder="留言或描述您想要的圖片..." onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleSend(); }"></textarea>
                 </div>
 
-                <!-- Footer Actions -->
                 <div class="flex justify-between items-center p-2 bg-[#161b22] rounded-b-md">
                     <div class="flex gap-1">
                         <input type="file" id="file-upload" class="hidden" accept="image/jpeg, image/png, image/webp">
                         <button onclick="document.getElementById('file-upload').click()" class="text-[#8b949e] hover:text-[#58a6ff] p-2 rounded-md transition-colors hover:bg-[#30363d]" title="附加圖片">
                             <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" class="fill-current"><path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5h-3.32Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"></path></svg>
                         </button>
-                        <!-- Style Prompt Tool Button -->
-                        <button onclick="togglePromptHelper()" type="button" class="text-[#8b949e] hover:text-[#e3b341] p-2 rounded-md transition-colors hover:bg-[#30363d]" title="風格提示詞工具">
-                            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" class="fill-current"><path d="M1 7.775V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775Zm1.5 0c0 .066.026.13.073.177l6.25 6.25a.25.25 0 0 0 .354 0l5.025-5.025a.25.25 0 0 0 0-.354l-6.25-6.25a.25.25 0 0 0-.177-.073H2.75a.25.25 0 0 0-.25.25ZM6 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>
+                        <!-- 🪄 開啟神器按鈕 -->
+                        <button onclick="openGodModal()" type="button" class="text-indigo-400 hover:text-indigo-300 p-2 rounded-md transition-colors hover:bg-[#30363d] flex items-center gap-1" title="提示詞神器">
+                            <span class="text-sm font-bold">🪄 神器</span>
                         </button>
                     </div>
                     
@@ -137,337 +148,173 @@
     </footer>
 
     <script>
-        const chatWindow = document.getElementById('chat-window');
-        const input = document.getElementById('user-input');
-        const btn = document.getElementById('send-btn');
-        const modeSelect = document.getElementById('mode-select');
-        const fileInput = document.getElementById('file-upload');
-        const previewContainer = document.getElementById('upload-preview-container');
-        const thumbnail = document.getElementById('upload-thumbnail');
-        
-        // 綁定專屬的 GAS 後端 API 網址
+        const chatWindow = document.getElementById('chat-window'), input = document.getElementById('user-input'), btn = document.getElementById('send-btn'), modeSelect = document.getElementById('mode-select'), fileInput = document.getElementById('file-upload'), previewContainer = document.getElementById('upload-preview-container'), thumbnail = document.getElementById('upload-thumbnail');
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyZ8ONPSxl0k5ZybOItosDbeCyb0P4Nb_xgcNlh3izSjrV-V11Y6lUMEkqs4JzZMjWhsg/exec";
         
-        // 前端指定的模型清單 (修正大師模式設定)
         const MODELS = {
-            t2i: {
-                fast: "imagen-4.0-fast-generate-001",
-                high: "imagen-4.0-ultra-generate-001" // 文字生圖大師模式
-            },
-            i2i: {
-                fast: "gemini-2.5-flash-image",
-                high: "nano-banana-pro-preview" // 圖片編輯大師模式
-            }
+            t2i: { fast: "imagen-4.0-fast-generate-001", high: "imagen-4.0-ultra-generate-001" },
+            i2i: { fast: "gemini-2.5-flash-image", high: "nano-banana-pro-preview" }
         };
 
-        let activeFile = null;
-        let currentAbortController = null; // 宣告中斷控制器變數
+        let activeFile = null, currentAbortController = null, conversationHistory = [], MAX_HISTORY_LENGTH = 10, lastGeneratedImage = null, lastGeneratedMime = null;
 
-        // --- 歷史紀錄與上下文管理 (支援 5 則對話記憶) ---
-        let conversationHistory = []; 
-        const MAX_HISTORY_LENGTH = 5 * 2; // 5次來回 (一問一答共 10 筆)
-        let lastGeneratedImage = null;
-        let lastGeneratedMime = null;
-
-        // --- 風格提示詞工具邏輯開始 ---
-        const styleData = [
-            {
-                category: "🎨 藝術風格 (Art Style)",
-                items: ["賽博龐克 (Cyberpunk)", "吉卜力動畫風格 (Ghibli Studio)", "寫實攝影 (Photorealistic)", "新海誠風格 (Makoto Shinkai)", "復古像素藝術 (Pixel Art)", "厚塗水彩 (Watercolor)", "3D 辛烷值渲染 (Octane Render)", "極簡主義 (Minimalism)"]
-            },
-            {
-                category: "💡 光影渲染 (Lighting)",
-                items: ["電影級光影 (Cinematic Lighting)", "霓虹燈光 (Neon Lights)", "丁達爾效應/體積光 (Volumetric Lighting)", "黃金時刻 (Golden Hour)", "柔和漫反射 (Soft Illumination)"]
-            },
-            {
-                category: "📷 鏡頭與視角 (Camera)",
-                items: ["微距特寫 (Macro Shot)", "超廣角 (Ultra-Wide Angle)", "鳥瞰視角 (Bird's-Eye View)", "景深模糊 (Depth of Field)", "魚眼鏡頭 (Fisheye Lens)"]
-            },
-            {
-                category: "🌌 氛圍與環境 (Atmosphere)",
-                items: ["史詩感 (Epic)", "黑暗奇幻 (Dark Fantasy)", "溫馨平靜 (Cozy & Peaceful)", "未來科技感 (Futuristic Sci-Fi)", "廢土風格 (Post-Apocalyptic)"]
-            }
+        // ==========================================
+        // 🪄 神器數據與邏輯 (整合自 React 版)
+        // ==========================================
+        const STYLE_CATEGORIES = [
+            { id: 'digital', title: '數位與現代藝術', styles: [ { name: '像素藝術', en: 'Pixel Art', prompt: 'pixel art, 8-bit, low resolution' }, { name: '扁平化設計', en: 'Flat Design', prompt: 'flat design, minimalist, bold colors, simple shapes' }, { name: '向量插畫', en: 'Vector Illustration', prompt: 'vector illustration, clean lines, graphic design' }, { name: '3D 渲染', en: '3D Rendering', prompt: '3D render, cinematic lighting, Unreal Engine, Octane render' }, { name: '等距透視', en: 'Isometric 3D', prompt: 'isometric view, 3D isometric' } ] },
+            { id: 'traditional', title: '傳統與古典藝術', styles: [ { name: '油畫', en: 'Oil Painting', prompt: 'oil painting, impasto, rich brushstrokes' }, { name: '水彩畫', en: 'Watercolor', prompt: 'watercolor painting, soft washes' }, { name: '鉛筆素描', en: 'Pencil Sketch', prompt: 'pencil sketch, hand-drawn, line art' }, { name: '印象派', en: 'Impressionism', prompt: 'impressionist painting' } ] },
+            { id: 'popculture', title: '流行文化', styles: [ { name: '動漫風格', en: 'Anime Style', prompt: 'anime illustration, clean line art' }, { name: '賽博龐克', en: 'Cyberpunk', prompt: 'cyberpunk, neon-lit, futuristic city' }, { name: '奇幻藝術', en: 'Fantasy Art', prompt: 'fantasy art, epic landscape' }, { name: '吉卜力', en: 'Studio Ghibli', prompt: 'Studio Ghibli style, whimsy' } ] },
+            { id: 'photography', title: '攝影風格', styles: [ { name: '寫實攝影', en: 'Photorealism', prompt: 'photorealistic, ultra detailed, 8k' }, { name: '微距攝影', en: 'Macro Photo', prompt: 'macro photography, extreme close-up' }, { name: '黃金時刻', en: 'Golden Hour', prompt: 'golden hour, warm tones' } ] },
+            { id: 'camera', title: '鏡頭視角', styles: [ { name: '廣角鏡頭', en: 'Wide Angle', prompt: 'wide angle lens, expansive' }, { name: '鳥瞰視角', en: 'Bird-Eye', prompt: 'birds-eye view, aerial photography' }, { name: '景深散景', en: 'Bokeh', prompt: 'depth of field, bokeh, blurred background' } ] },
+            { id: 'negatives', title: '🚫 負面排除', styles: [ { name: '通用瑕疵', en: 'Bad Quality', prompt: 'blurry, low quality, worst quality, text, watermark' }, { name: '肢體崩壞', en: 'Bad Anatomy', prompt: 'ugly, deformed, extra limbs, bad hands' } ] }
         ];
 
-        function initPromptHelper() {
-            const container = document.getElementById('style-categories');
-            styleData.forEach(group => {
-                const groupDiv = document.createElement('div');
-                groupDiv.innerHTML = `<div class="text-[#8b949e] text-xs font-semibold mb-2">${group.category}</div>`;
-                const tagsDiv = document.createElement('div');
-                tagsDiv.className = "flex flex-wrap gap-2";
-                
-                group.items.forEach(item => {
-                    const tag = document.createElement('button');
-                    tag.type = "button";
-                    tag.className = "border border-[#30363d] bg-[#21262d] text-[#c9d1d9] hover:bg-[#30363d] hover:border-[#8b949e] transition-colors text-xs px-2.5 py-1 rounded-full text-left";
-                    tag.innerText = item;
-                    tag.onclick = () => appendPrompt(item);
-                    tagsDiv.appendChild(tag);
-                });
-                groupDiv.appendChild(tagsDiv);
-                container.appendChild(groupDiv);
-            });
+        let selectedGodTags = [];
+
+        function openGodModal() { document.getElementById('god-prompt-modal').classList.remove('hidden'); renderGodSidebar(); renderGodTags(STYLE_CATEGORIES[0].id); }
+        function closeGodModal() { document.getElementById('god-prompt-modal').classList.add('hidden'); }
+
+        function renderGodSidebar() {
+            const sidebar = document.getElementById('god-sidebar');
+            sidebar.innerHTML = STYLE_CATEGORIES.map(c => `
+                <button onclick="renderGodTags('${c.id}')" class="w-full px-4 py-3 text-left text-sm font-medium transition-colors hover:bg-[#161b22] border-l-2 border-transparent focus:border-indigo-500 focus:bg-[#161b22]">${c.title}</button>
+            `).join('');
         }
 
-        function togglePromptHelper() {
-            const panel = document.getElementById('prompt-helper-panel');
-            if(panel.classList.contains('hidden')) {
-                panel.classList.remove('hidden');
-                panel.classList.add('flex');
-            } else {
-                panel.classList.add('hidden');
-                panel.classList.remove('flex');
-            }
+        function renderGodTags(categoryId) {
+            const category = STYLE_CATEGORIES.find(c => c.id === categoryId);
+            const grid = document.getElementById('style-tags-grid');
+            grid.innerHTML = category.styles.map(s => `
+                <button onclick="toggleGodTag('${s.prompt}')" class="p-3 border border-[#30363d] rounded-lg text-left hover:border-indigo-500 transition-all bg-[#161b22]">
+                    <div class="text-sm font-bold">${s.name}</div>
+                    <div class="text-[10px] text-[#8b949e] line-clamp-1">${s.en}</div>
+                </button>
+            `).join('');
         }
 
-        function appendPrompt(text) {
-            const currentValue = input.value.trim();
-            const prefix = currentValue ? ", " : "";
-            input.value = currentValue + prefix + text;
+        function toggleGodTag(prompt) {
+            if (selectedGodTags.includes(prompt)) { selectedGodTags = selectedGodTags.filter(t => t !== prompt); } 
+            else { selectedGodTags.push(prompt); }
+            updateTagPreview();
+        }
+
+        function updateTagPreview() {
+            const preview = document.getElementById('selected-tags-preview');
+            preview.innerHTML = selectedGodTags.map(t => `<span class="bg-indigo-900/40 border border-indigo-500/50 px-2 py-0.5 rounded-full text-xs animate-fade-in">${t}</span>`).join('');
+        }
+
+        function clearSelectedTags() { selectedGodTags = []; updateTagPreview(); }
+        function applyGodPrompt() {
+            const current = input.value.trim();
+            const tagsStr = selectedGodTags.join(', ');
+            input.value = current ? `${current}, ${tagsStr}` : tagsStr;
+            closeGodModal();
             input.focus();
         }
-        // --- 風格提示詞工具邏輯結束 ---
 
+        // ==========================================
+        // 核心通訊邏輯
+        // ==========================================
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (file) {
-                modeSelect.value = "i2i";
-                activeFile = file;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    thumbnail.src = e.target.result;
-                    previewContainer.classList.remove('preview-hidden');
-                    previewContainer.classList.add('preview-active');
-                };
-                reader.readAsDataURL(file);
-            }
+            if (file) { modeSelect.value = "i2i"; activeFile = file; const reader = new FileReader(); reader.onload = (e) => { thumbnail.src = e.target.result; previewContainer.classList.replace('preview-hidden', 'preview-active'); }; reader.readAsDataURL(file); }
         });
 
-        function clearUpload() {
-            activeFile = null;
-            fileInput.value = '';
-            previewContainer.classList.remove('preview-active');
-            previewContainer.classList.add('preview-hidden');
-            modeSelect.value = "t2i";
-        }
-
-        function cancelGeneration() {
-            if (currentAbortController) {
-                currentAbortController.abort(); // 中斷 fetch 請求
-            }
-        }
+        function clearUpload() { activeFile = null; fileInput.value = ''; previewContainer.classList.replace('preview-active', 'preview-hidden'); modeSelect.value = "t2i"; }
+        function cancelGeneration() { if (currentAbortController) currentAbortController.abort(); }
 
         async function handleSend() {
             const text = input.value.trim();
-            if (!text && !activeFile && !lastGeneratedImage) return; // 允許只有歷史圖片的情況
-            
-            // 關閉可能開著的風格面板
-            document.getElementById('prompt-helper-panel').classList.add('hidden');
-            document.getElementById('prompt-helper-panel').classList.remove('flex');
+            if (!text && !activeFile && !lastGeneratedImage) return;
 
             const selectedQuality = document.querySelector('input[name="quality"]:checked').value;
             const targetModel = MODELS[modeSelect.value][selectedQuality];
-
-            // 智能路由修正：確保模型能夠正確使用相應的 API 端點
             let backendMode = modeSelect.value;
-            if (targetModel.includes('nano-banana') || targetModel.includes('gemini')) {
-                backendMode = 'i2i'; 
-            }
+            if (targetModel.includes('nano-banana') || targetModel.includes('gemini')) backendMode = 'i2i';
 
-            // 構建歷史紀錄 Payload
             let currentParts = [];
-            if (text) currentParts.push({ text: text || "請根據圖片進行修改或提供建議。" });
+            if (text) currentParts.push({ text: text });
 
             let userMsg = text;
             if (activeFile) {
                 const base64Data = await toBase64(activeFile);
-                const fileData = base64Data.split(',')[1];
-                currentParts.push({ inlineData: { mimeType: activeFile.type, data: fileData } });
-                userMsg = `[已附加新圖片]\n\n${text}`;
+                currentParts.push({ inlineData: { mimeType: activeFile.type, data: base64Data.split(',')[1] } });
+                userMsg = `[已附加圖片]\n\n${text}`;
                 clearUpload();
             } else if (backendMode === 'i2i' && lastGeneratedImage) {
-                // 如果是圖生圖模式且沒有上傳新圖，自動將上一張生成的圖片作為參考圖
                 currentParts.push({ inlineData: { mimeType: lastGeneratedMime, data: lastGeneratedImage } });
-                userMsg = `[使用上一張生成的圖片作為參考]\n\n${text}`;
+                userMsg = `[迭代修改]\n\n${text}`;
             }
 
             addMessage('user', userMsg);
             input.value = '';
-
-            // 存入前端記憶
             conversationHistory.push({ role: 'user', parts: currentParts });
-            if (conversationHistory.length > MAX_HISTORY_LENGTH) {
-                conversationHistory = conversationHistory.slice(conversationHistory.length - MAX_HISTORY_LENGTH);
-            }
-
-            const payload = { 
-                message: text || "請根據這張圖片進行修改或提供建議。", 
-                mode: backendMode,
-                quality: selectedQuality,
-                model: targetModel,
-                history: conversationHistory // 將對話紀錄送給後端
-            };
+            if (conversationHistory.length > MAX_HISTORY_LENGTH) conversationHistory.shift();
 
             setLoading(true);
-            
-            // 實例化新的 AbortController
             currentAbortController = new AbortController();
-            
+
             try {
-                let response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    signal: currentAbortController.signal // 綁定中斷信號
-                });
-                
+                const payload = { message: text, mode: backendMode, quality: selectedQuality, model: targetModel, history: conversationHistory };
+                let response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload), signal: currentAbortController.signal });
                 let data = await response.json();
-                
-                // 自動備援機制 (Graceful Degradation)：攔截 503 等高負載錯誤並降級重試
-                if (data.status !== "success" && data.error && (data.error.includes("503") || data.error.includes("high demand") || data.error.includes("UNAVAILABLE")) && selectedQuality === 'high') {
-                    addMessage('ai', "⚠️ **自動備援啟動**：大師模式引擎目前處於高負載狀態 (503 High Demand)。系統已觸發優雅降級，正自動為您切換至「⚡ 草稿模式」極速引擎重新生成，請稍候...");
-                    
-                    // 切換為 fast 備援模型
-                    const fallbackModel = MODELS[modeSelect.value]['fast'];
-                    let fallbackBackendMode = modeSelect.value;
-                    if (fallbackModel.includes('nano-banana') || fallbackModel.includes('gemini')) {
-                        fallbackBackendMode = 'i2i'; 
-                    }
-                    
-                    payload.quality = 'fast';
-                    payload.model = fallbackModel;
-                    payload.mode = fallbackBackendMode;
-                    
-                    // 第二次 Fetch (使用降級模型重試)
-                    response = await fetch(GAS_URL, {
-                        method: 'POST',
-                        body: JSON.stringify(payload),
-                        signal: currentAbortController.signal
-                    });
+
+                if (data.status !== "success" && data.error && (data.error.includes("503") || data.error.includes("high demand"))) {
+                    addMessage('ai', "⚠️ **大師引擎塞車中**：自動降級至「⚡ 草稿模式」極速生成中...");
+                    payload.quality = 'fast'; payload.model = MODELS[modeSelect.value]['fast']; payload.mode = (payload.model.includes('gemini') ? 'i2i' : 't2i');
+                    response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload), signal: currentAbortController.signal });
                     data = await response.json();
                 }
-                
+
                 if (data.status === "success") {
                     addMessage('ai', data.reply, { image: data.image, mime: data.mime });
-                    
-                    // 將 AI 的回應存入記憶
                     let aiParts = [];
                     if (data.reply) aiParts.push({ text: data.reply });
-                    if (data.image) {
-                        aiParts.push({ inlineData: { mimeType: data.mime, data: data.image } });
-                        // 更新最後生成的圖片快取，供下一次迭代使用
-                        lastGeneratedImage = data.image;
-                        lastGeneratedMime = data.mime;
-                    }
-                    if (aiParts.length > 0) {
-                        conversationHistory.push({ role: 'model', parts: aiParts });
-                    }
-                } else { 
-                    addMessage('ai', "🚨 錯誤: " + data.error); 
-                    // 若失敗，將剛剛送出的 user request 從歷史中移除，避免污染上下文
-                    conversationHistory.pop();
-                }
+                    if (data.image) { aiParts.push({ inlineData: { mimeType: data.mime, data: data.image } }); lastGeneratedImage = data.image; lastGeneratedMime = data.mime; }
+                    conversationHistory.push({ role: 'model', parts: aiParts });
+                } else { addMessage('ai', "🚨 錯誤: " + data.error); conversationHistory.pop(); }
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    // 若是使用者主動中斷
-                    addMessage('ai', "🛑 動作已由使用者取消。");
-                } else {
-                    addMessage('ai', "❌ 執行失敗: " + error.message + "\n\n*(提示：請確認您的 GAS 部署設定中，「誰可以存取」是否已設為「所有人」)*");
-                }
-                // 若失敗，將剛剛送出的 user request 從歷史中移除
-                if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'user') {
-                    conversationHistory.pop();
-                }
-            } finally {
-                setLoading(false);
-            }
+                if (error.name === 'AbortError') addMessage('ai', "🛑 動作已取消。");
+                else addMessage('ai', "❌ 連線失敗。");
+                conversationHistory.pop();
+            } finally { setLoading(false); }
         }
 
-        // 渲染 GitHub Timeline Issue 留言風格
         function addMessage(role, text, meta = null) {
             const isUser = role === 'user';
-            const author = isUser ? '您' : 'anyGem';
-            const badge = !isUser ? '<span class="border border-[#30363d] text-[#8b949e] rounded-full px-2 py-[1px] text-[10px] ml-2 font-medium">bot</span>' : '';
-            const avatarColor = isUser ? 'bg-[#238636]' : 'bg-[#8957e5]'; 
-            const avatarInit = isUser ? 'U' : 'A';
-            
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+            const author = isUser ? '您' : 'anyGem', avatarColor = isUser ? 'bg-[#238636]' : 'bg-[#8957e5]';
+            const now = new Date(), timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const wrapper = document.createElement('div');
-            wrapper.className = `flex gap-3 md:gap-4 animate-fade-in w-full max-w-4xl mx-auto`;
+            wrapper.className = `flex gap-3 md:gap-4 animate-fade-in w-full max-w-4xl mx-auto mb-6`;
             
-            let imgHTML = '';
-            if (meta && meta.image) {
-                imgHTML = `<img src="data:${meta.mime || 'image/png'};base64,${meta.image}" class="w-full max-w-2xl rounded-md mb-4 border border-[#30363d] cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open(this.src, '_blank')">`;
-            }
-
-            let textHTML = '';
-            if (text) {
-                const formattedText = text.replace(/\n/g, '<br>');
-                textHTML = `<div class="text-[14px] leading-[1.5] break-words text-[#c9d1d9]">${formattedText}</div>`;
-            }
+            let imgHTML = meta && meta.image ? `<img src="data:${meta.mime || 'image/png'};base64,${meta.image}" class="w-full max-w-2xl rounded-md mb-4 border border-[#30363d] cursor-pointer hover:opacity-90" onclick="window.open(this.src, '_blank')">` : '';
+            let textHTML = text ? `<div class="text-[14px] leading-[1.5] break-words text-[#c9d1d9]">${text.replace(/\n/g, '<br>')}</div>` : '';
 
             wrapper.innerHTML = `
                 <div class="flex-shrink-0 hidden md:block">
-                    <div class="w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-white font-bold text-lg shadow-sm">
-                        ${avatarInit}
-                    </div>
+                    <div class="w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-white font-bold text-lg">${isUser ? 'U' : 'A'}</div>
                 </div>
                 <div class="flex-grow min-w-0">
-                    <div class="border border-[#30363d] rounded-md bg-[#0d1117] relative before:hidden md:before:block before:absolute before:right-[100%] before:top-4 before:border-8 before:border-transparent before:border-r-[#30363d] after:hidden md:after:block after:absolute after:right-[100%] after:top-[17px] after:border-[7px] after:border-transparent after:border-r-[#161b22]">
+                    <div class="border border-[#30363d] rounded-md bg-[#0d1117] relative">
                         <div class="bg-[#161b22] border-b border-[#30363d] px-3 py-2 rounded-t-md text-sm flex items-center text-[#8b949e]">
-                            <span class="font-semibold text-[#c9d1d9]">${author}</span> ${badge}
-                            <span class="ml-2 hidden sm:inline">留言於 ${timeString}</span>
+                            <span class="font-semibold text-[#c9d1d9]">${author}</span> ${!isUser ? '<span class="border border-[#30363d] text-[#8b949e] rounded-full px-2 py-[1px] text-[10px] ml-2 font-medium">bot</span>' : ''}
+                            <span class="ml-2 hidden sm:inline">於 ${timeString}</span>
                         </div>
-                        <div class="p-3 md:p-4">
-                            ${imgHTML}
-                            ${textHTML}
-                        </div>
+                        <div class="p-3 md:p-4">${imgHTML}${textHTML}</div>
                     </div>
-                </div>
-            `;
-
-            chatWindow.appendChild(wrapper); 
-            
-            setTimeout(() => {
-                chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
-            }, 100);
+                </div>`;
+            chatWindow.appendChild(wrapper);
+            chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
         }
 
         function setLoading(isLoading) { 
-            if (isLoading) { 
-                // 載入中：按鈕變成紅色並帶有「取消」功能
-                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>取消</span>`;
-                btn.classList.replace('bg-[#238636]', 'bg-[#da3633]');
-                btn.classList.replace('hover:bg-[#2ea043]', 'hover:bg-[#b62324]');
-                btn.onclick = cancelGeneration;
-            } else { 
-                // 恢復原狀
-                btn.innerHTML = '<span>生成</span>';
-                btn.classList.replace('bg-[#da3633]', 'bg-[#238636]');
-                btn.classList.replace('hover:bg-[#b62324]', 'hover:bg-[#2ea043]');
-                btn.onclick = handleSend;
-                currentAbortController = null; // 清除控制器
-            } 
-        }
-        
-        function toBase64(file) { 
-            return new Promise((resolve, reject) => { 
-                const reader = new FileReader(); 
-                reader.onload = () => resolve(reader.result); 
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file); 
-            }); 
+            if (isLoading) { btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 取消`; btn.classList.replace('bg-[#238636]', 'bg-[#da3633]'); btn.onclick = cancelGeneration; } 
+            else { btn.innerHTML = '生成'; btn.classList.replace('bg-[#da3633]', 'bg-[#238636]'); btn.onclick = handleSend; } 
         }
 
-        // 初始化
-        window.onload = () => {
-            initPromptHelper(); // 初始化風格提示詞工具
-            setTimeout(() => {
-                addMessage('ai', "歡迎來到 **gem-studio/anyGem**！🚀\n\n我已經準備好為您生成或編輯圖片了。您可以點擊下方工具列的 **🏷️ 標籤按鈕** 來選擇畫風與光影，幫助您更精準地生成圖片！");
-            }, 500);
-        };
+        function toBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); }); }
+        window.onload = () => { addMessage('ai', "歡迎來到 **anyGem 繪圖引擎**！🚀\n\n你可以直接輸入提示詞，或者點擊下方工具列的 **🪄 神器** 按鈕來快速組合專業的畫風標籤。"); };
     </script>
 </body>
 </html>
