@@ -163,6 +163,12 @@
         let activeFile = null;
         let currentAbortController = null; // 宣告中斷控制器變數
 
+        // --- 歷史紀錄與上下文管理 (支援 5 則對話記憶) ---
+        let conversationHistory = []; 
+        const MAX_HISTORY_LENGTH = 5 * 2; // 5次來回 (一問一答共 10 筆)
+        let lastGeneratedImage = null;
+        let lastGeneratedMime = null;
+
         // --- 風格提示詞工具邏輯開始 ---
         const styleData = [
             {
@@ -254,15 +260,12 @@
 
         async function handleSend() {
             const text = input.value.trim();
-            if (!text && !activeFile) return;
+            if (!text && !activeFile && !lastGeneratedImage) return; // 允許只有歷史圖片的情況
             
             // 關閉可能開著的風格面板
             document.getElementById('prompt-helper-panel').classList.add('hidden');
             document.getElementById('prompt-helper-panel').classList.remove('flex');
 
-            const userMsg = activeFile ? `[已附加圖片]\n\n${text}` : text;
-            addMessage('user', userMsg);
-            
             const selectedQuality = document.querySelector('input[name="quality"]:checked').value;
             const targetModel = MODELS[modeSelect.value][selectedQuality];
 
@@ -272,21 +275,39 @@
                 backendMode = 'i2i'; 
             }
 
+            // 構建歷史紀錄 Payload
+            let currentParts = [];
+            if (text) currentParts.push({ text: text || "請根據圖片進行修改或提供建議。" });
+
+            let userMsg = text;
+            if (activeFile) {
+                const base64Data = await toBase64(activeFile);
+                const fileData = base64Data.split(',')[1];
+                currentParts.push({ inlineData: { mimeType: activeFile.type, data: fileData } });
+                userMsg = `[已附加新圖片]\n\n${text}`;
+                clearUpload();
+            } else if (backendMode === 'i2i' && lastGeneratedImage) {
+                // 如果是圖生圖模式且沒有上傳新圖，自動將上一張生成的圖片作為參考圖
+                currentParts.push({ inlineData: { mimeType: lastGeneratedMime, data: lastGeneratedImage } });
+                userMsg = `[使用上一張生成的圖片作為參考]\n\n${text}`;
+            }
+
+            addMessage('user', userMsg);
+            input.value = '';
+
+            // 存入前端記憶
+            conversationHistory.push({ role: 'user', parts: currentParts });
+            if (conversationHistory.length > MAX_HISTORY_LENGTH) {
+                conversationHistory = conversationHistory.slice(conversationHistory.length - MAX_HISTORY_LENGTH);
+            }
+
             const payload = { 
                 message: text || "請根據這張圖片進行修改或提供建議。", 
                 mode: backendMode,
                 quality: selectedQuality,
-                model: targetModel 
+                model: targetModel,
+                history: conversationHistory // 將對話紀錄送給後端
             };
-            
-            input.value = '';
-            
-            if (activeFile) {
-                const base64Data = await toBase64(activeFile);
-                payload.file_data = base64Data.split(',')[1];
-                payload.mime_type = activeFile.type;
-                clearUpload();
-            }
 
             setLoading(true);
             
@@ -328,8 +349,23 @@
                 
                 if (data.status === "success") {
                     addMessage('ai', data.reply, { image: data.image, mime: data.mime });
+                    
+                    // 將 AI 的回應存入記憶
+                    let aiParts = [];
+                    if (data.reply) aiParts.push({ text: data.reply });
+                    if (data.image) {
+                        aiParts.push({ inlineData: { mimeType: data.mime, data: data.image } });
+                        // 更新最後生成的圖片快取，供下一次迭代使用
+                        lastGeneratedImage = data.image;
+                        lastGeneratedMime = data.mime;
+                    }
+                    if (aiParts.length > 0) {
+                        conversationHistory.push({ role: 'model', parts: aiParts });
+                    }
                 } else { 
                     addMessage('ai', "🚨 錯誤: " + data.error); 
+                    // 若失敗，將剛剛送出的 user request 從歷史中移除，避免污染上下文
+                    conversationHistory.pop();
                 }
             } catch (error) {
                 if (error.name === 'AbortError') {
@@ -337,6 +373,10 @@
                     addMessage('ai', "🛑 動作已由使用者取消。");
                 } else {
                     addMessage('ai', "❌ 執行失敗: " + error.message + "\n\n*(提示：請確認您的 GAS 部署設定中，「誰可以存取」是否已設為「所有人」)*");
+                }
+                // 若失敗，將剛剛送出的 user request 從歷史中移除
+                if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'user') {
+                    conversationHistory.pop();
                 }
             } finally {
                 setLoading(false);
