@@ -148,6 +148,18 @@
         // 綁定專屬的 GAS 後端 API 網址
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyZ8ONPSxl0k5ZybOItosDbeCyb0P4Nb_xgcNlh3izSjrV-V11Y6lUMEkqs4JzZMjWhsg/exec";
         
+        // 前端指定的模型清單
+        const MODELS = {
+            t2i: {
+                fast: "imagen-4.0-fast-generate-001",
+                high: "imagen-4.0-ultra-generate-001" // 文字生圖大師模式
+            },
+            i2i: {
+                fast: "gemini-2.5-flash-image",
+                high: "nano-banana-pro-preview" // 圖片編輯大師模式
+            }
+        };
+
         let activeFile = null;
 
         // --- 風格提示詞工具邏輯開始 ---
@@ -248,10 +260,13 @@
             addMessage('user', userMsg);
             
             const selectedQuality = document.querySelector('input[name="quality"]:checked').value;
+            const targetModel = MODELS[modeSelect.value][selectedQuality]; // 獲取前端明確指定的模型名稱
+
             const payload = { 
                 message: text || "請根據這張圖片進行修改或提供建議。", 
                 mode: modeSelect.value,
-                quality: selectedQuality
+                quality: selectedQuality,
+                model: targetModel // 將模型名稱一併傳送給後端
             };
             
             input.value = '';
