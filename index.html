@@ -161,6 +161,7 @@
         };
 
         let activeFile = null;
+        let currentAbortController = null; // 宣告中斷控制器變數
 
         // --- 風格提示詞工具邏輯開始 ---
         const styleData = [
@@ -219,9 +220,6 @@
             const prefix = currentValue ? ", " : "";
             input.value = currentValue + prefix + text;
             input.focus();
-            
-            // 可以選擇加入完成後自動關閉面板
-            // togglePromptHelper(); 
         }
         // --- 風格提示詞工具邏輯結束 ---
 
@@ -248,6 +246,12 @@
             modeSelect.value = "t2i";
         }
 
+        function cancelGeneration() {
+            if (currentAbortController) {
+                currentAbortController.abort(); // 中斷 fetch 請求
+            }
+        }
+
         async function handleSend() {
             const text = input.value.trim();
             if (!text && !activeFile) return;
@@ -260,13 +264,13 @@
             addMessage('user', userMsg);
             
             const selectedQuality = document.querySelector('input[name="quality"]:checked').value;
-            const targetModel = MODELS[modeSelect.value][selectedQuality]; // 獲取前端明確指定的模型名稱
+            const targetModel = MODELS[modeSelect.value][selectedQuality];
 
             const payload = { 
                 message: text || "請根據這張圖片進行修改或提供建議。", 
                 mode: modeSelect.value,
                 quality: selectedQuality,
-                model: targetModel // 將模型名稱一併傳送給後端
+                model: targetModel 
             };
             
             input.value = '';
@@ -280,11 +284,14 @@
 
             setLoading(true);
             
+            // 實例化新的 AbortController
+            currentAbortController = new AbortController();
+            
             try {
-                // 使用原生的 fetch 發送請求到 Google Apps Script
                 const response = await fetch(GAS_URL, {
                     method: 'POST',
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    signal: currentAbortController.signal // 綁定中斷信號
                 });
                 
                 const data = await response.json();
@@ -295,7 +302,12 @@
                     addMessage('ai', "🚨 錯誤: " + data.error); 
                 }
             } catch (error) {
-                addMessage('ai', "❌ 執行失敗: " + error.message + "\n\n*(提示：請確認您的 GAS 部署設定中，「誰可以存取」是否已設為「所有人」)*");
+                if (error.name === 'AbortError') {
+                    // 若是使用者主動中斷
+                    addMessage('ai', "🛑 動作已由使用者取消。");
+                } else {
+                    addMessage('ai', "❌ 執行失敗: " + error.message + "\n\n*(提示：請確認您的 GAS 部署設定中，「誰可以存取」是否已設為「所有人」)*");
+                }
             } finally {
                 setLoading(false);
             }
@@ -309,23 +321,19 @@
             const avatarColor = isUser ? 'bg-[#238636]' : 'bg-[#8957e5]'; 
             const avatarInit = isUser ? 'U' : 'A';
             
-            // 處理時間
             const now = new Date();
             const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             const wrapper = document.createElement('div');
             wrapper.className = `flex gap-3 md:gap-4 animate-fade-in w-full max-w-4xl mx-auto`;
             
-            // 圖片 HTML
             let imgHTML = '';
             if (meta && meta.image) {
                 imgHTML = `<img src="data:${meta.mime || 'image/png'};base64,${meta.image}" class="w-full max-w-2xl rounded-md mb-4 border border-[#30363d] cursor-pointer hover:opacity-90 transition-opacity" onclick="window.open(this.src, '_blank')">`;
             }
 
-            // 文字 HTML (處理換行與簡單格式)
             let textHTML = '';
             if (text) {
-                // 將換行轉為 <br>
                 const formattedText = text.replace(/\n/g, '<br>');
                 textHTML = `<div class="text-[14px] leading-[1.5] break-words text-[#c9d1d9]">${formattedText}</div>`;
             }
@@ -338,12 +346,10 @@
                 </div>
                 <div class="flex-grow min-w-0">
                     <div class="border border-[#30363d] rounded-md bg-[#0d1117] relative before:hidden md:before:block before:absolute before:right-[100%] before:top-4 before:border-8 before:border-transparent before:border-r-[#30363d] after:hidden md:after:block after:absolute after:right-[100%] after:top-[17px] after:border-[7px] after:border-transparent after:border-r-[#161b22]">
-                        <!-- Comment Header -->
                         <div class="bg-[#161b22] border-b border-[#30363d] px-3 py-2 rounded-t-md text-sm flex items-center text-[#8b949e]">
                             <span class="font-semibold text-[#c9d1d9]">${author}</span> ${badge}
                             <span class="ml-2 hidden sm:inline">留言於 ${timeString}</span>
                         </div>
-                        <!-- Comment Body -->
                         <div class="p-3 md:p-4">
                             ${imgHTML}
                             ${textHTML}
@@ -360,11 +366,19 @@
         }
 
         function setLoading(isLoading) { 
-            btn.disabled = isLoading; 
             if (isLoading) { 
-                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>生成中...</span>`;
+                // 載入中：按鈕變成紅色並帶有「取消」功能
+                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span>取消</span>`;
+                btn.classList.replace('bg-[#238636]', 'bg-[#da3633]');
+                btn.classList.replace('hover:bg-[#2ea043]', 'hover:bg-[#b62324]');
+                btn.onclick = cancelGeneration;
             } else { 
+                // 恢復原狀
                 btn.innerHTML = '<span>生成</span>';
+                btn.classList.replace('bg-[#da3633]', 'bg-[#238636]');
+                btn.classList.replace('hover:bg-[#b62324]', 'hover:bg-[#2ea043]');
+                btn.onclick = handleSend;
+                currentAbortController = null; // 清除控制器
             } 
         }
         
